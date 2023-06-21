@@ -1,0 +1,45 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Wed Jun 21 08:39:28 2023
+[*]
+[dumpfile] "C:\Users\simon\Downloads\P9\repositories\ghdl-axi-sim\axis-skidbuffer\ghdl\axis-flow-control\wave.vcd"
+[dumpfile_mtime] "Wed Jun 21 08:39:07 2023"
+[dumpfile_size] 21517
+[savefile] "C:\Users\simon\Downloads\P9\repositories\ghdl-axi-sim\axis-skidbuffer\ghdl\axis-flow-control\waveform.gtkw"
+[timestart] 0
+[size] 1687 1408
+[pos] -1 -1
+*-25.000000 90900000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 197
+[signals_width] 217
+[sst_expanded] 1
+[sst_vpaned_height] 437
+@25
+[color] 5
+tb_axis.clk_count[7:0]
+@28
+[color] 3
+tb_axis.clk
+[color] 3
+tb_axis.rst_n
+tb_axis.m_axis_tvalid
+@22
+tb_axis.m_axis_tdata[7:0]
+@28
+tb_axis.m_axis_tstrb[0]
+tb_axis.m_axis_tready
+[color] 2
+tb_axis.s_axis_tvalid
+@22
+[color] 2
+tb_axis.s_axis_tdata[7:0]
+@28
+[color] 2
+tb_axis.s_axis_tstrb[0]
+[color] 2
+tb_axis.s_axis_tready
+tb_axis.fifo_full
+tb_axis.fifo_empty
+tb_axis.fifo_empty
+[pattern_trace] 1
+[pattern_trace] 0
