@@ -107,6 +107,7 @@ architecture arch_imp of axis_flow_control is
 
   signal en_tready : std_logic;
   signal tready_buf : std_logic;
+  signal tvalid_buf : std_logic;
 
 begin
   -- I/O connections assignments
@@ -134,6 +135,7 @@ begin
 
   -- tready is only allowed to be '1' if downstream M port is ready AND if the buffer is in XON condition
   tready_buf <= en_tready and i_m_axis_tready;
+  o_m_axis_tvalid <= en_tready and tvalid_buf; 
 
   p_en_tready : process(aclk)
   begin
@@ -168,7 +170,7 @@ begin
     s_ready_o => o_s_axis_tready,
     s_data_i  => i_axis_data_strb,
 
-    m_valid_o => o_m_axis_tvalid,
+    m_valid_o => tvalid_buf,
     m_last_o  => o_m_axis_tlast,
     m_ready_i => tready_buf,
     m_data_o  => o_axis_data_strb

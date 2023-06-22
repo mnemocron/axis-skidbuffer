@@ -96,6 +96,7 @@ architecture bh of tb_axis is
   signal rst_n : std_logic;
 
   signal clk_count : std_logic_vector(7 downto 0) := (others => '0');
+  signal xfer_count : std_logic_vector(7 downto 0) := (others => '0');
 begin
 
   -- generate clk signal
@@ -116,6 +117,27 @@ begin
     wait for (CLK_PERIOD / 4);
     rst_n <= '1';
     wait;
+  end process;
+
+  -- count transations
+  p_xfer_cnt : process(clk)
+  begin
+    if rising_edge(clk) then
+      if rst_n = '0' then
+        xfer_count <= (others => '0');
+      else
+        if m_axis_tvalid = '1' and m_axis_tready = '1' then
+          xfer_count <= m_axis_tdata;
+
+        --  if unsigned(xfer_count) = 4 then
+        --    xfer_count <= "00000001";
+        --  else
+        --    xfer_count <= std_logic_vector( unsigned(xfer_count) +1 );
+        --  end if;
+        
+        end if;
+      end if;
+    end if;
   end process;
 
   -- generate ready signal
