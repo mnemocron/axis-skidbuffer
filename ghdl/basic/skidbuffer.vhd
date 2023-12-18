@@ -3,8 +3,8 @@
 -- Engineer:       simon.burkhardt
 -- 
 -- Create Date:    2023-04-21
--- Design Name:    AXIS skidbuffer
--- Module Name:    tb_skid - bh
+-- Design Name:    Generic skidbuffer for AXI
+-- Module Name:    skidbuffer
 -- Project Name:   
 -- Target Devices: 
 -- Tool Versions:  GHDL 0.37
@@ -12,7 +12,7 @@
 -- 
 -- Dependencies:   
 -- 
--- Revision:
+-- Revision: 1.0 - Fixed fundamental flaw when m_tready='0' at start of transaction 
 -- Revision 0.01 - File Created
 -- Additional Comments:
 -- 
@@ -27,121 +27,91 @@ entity skidbuffer is
     OPT_DATA_REG : boolean := True
   );
   port (
-    clock     : in std_logic;
-    reset_n   : in std_logic;
+    s_aclk     : in std_logic;
+    s_aresetn  : in std_logic;
 
-    s_valid_i : in  std_logic;
-    s_last_i  : in  std_logic;
-    s_ready_o : out std_logic;
-    s_data_i  : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
+    s_valid : in  std_logic;
+    s_ready : out std_logic;
+    s_data  : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
 
-    m_valid_o : out std_logic;
-    m_last_o  : out std_logic;
-    m_ready_i : in  std_logic;
-    m_data_o  : out std_logic_vector(DATA_WIDTH - 1 downto 0)
+    m_valid : out std_logic;
+    m_ready : in  std_logic;
+    m_data  : out std_logic_vector(DATA_WIDTH - 1 downto 0)
   );
 end skidbuffer;
 
-architecture arch_imp of skidbuffer is
+architecture behav of skidbuffer is
   -- register signals
   signal reg_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal reg_last  : std_logic;
   signal reg_valid : std_logic;
   signal reg_ready : std_logic;
 
   -- skid buffer signals (only used when OPT_DATA_REG = '1')
   signal skd_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal skd_last  : std_logic;
+  signal skd_valid : std_logic;
 
   -- output signals for output multiplexer
   signal out_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal out_last  : std_logic;
+  signal out_valid : std_logic;
 
 begin
   -- I/O connections assignments
-  m_valid_o <= reg_valid;
-  s_ready_o <= reg_ready;
-  m_data_o  <= out_data;
-  m_last_o  <= out_last;
+  s_ready <= reg_ready;
 
-  -- ready is always registered
-  p_reg_ready : process(clock)
+  -- ready is always registered in skidbuffer
+  p_reg_ready : process(s_aclk)
   begin
-    if rising_edge(clock) then 
-      if reset_n = '0' then
+    if rising_edge(s_aclk) then 
+      if s_aresetn = '0' then
         reg_ready <= '0';
       else
-        reg_ready <= m_ready_i;
+        reg_ready <= m_ready;
+      end if;
+    end if;
+  end process;
+
+  -- output of the skidbuffer (either registered or bypass)
+  out_data  <= skd_data  when (reg_ready = '0') else s_data;
+  out_valid <= skd_valid when (reg_ready = '0') else s_valid;
+
+  -- actual skidbuffer register
+  p_reg : process (s_aclk)
+  begin
+    if rising_edge(s_aclk) then 
+      if s_aresetn = '0' then
+        skd_data  <= (others => '0');
+        skd_valid <= '0';
+      else
+        if reg_ready = '1' then
+          skd_data <= s_data;
+          skd_valid <= s_valid;
+        else
+          skd_data <= skd_data;
+          skd_valid <= skd_valid;
+        end if;
       end if;
     end if;
   end process;
 
 -- NOT REGISTERED OUTPUT -------------------------------------------------------
   gen_no_register : if not OPT_DATA_REG generate
-    reg_valid <= s_valid_i; -- valid is not registered
     -- output multiplexer
-    out_data <= reg_data when (reg_ready = '0') else s_data_i;
-    out_last <= reg_last when (reg_ready = '0') else s_last_i;
-
-    p_reg : process (clock)
-    begin
-      if rising_edge(clock) then 
-        if reset_n = '0' then
-          reg_data  <= (others => '0');
-          reg_last  <= '0';
-        else
-          if reg_ready = '1' then
-            reg_data <= s_data_i;
-            reg_last <= s_last_i;
-          else
-            reg_data <= reg_data;
-            reg_last <= reg_last;
-          end if;
-        end if;
-      end if;
-    end process;
-    
+    m_valid <= out_valid;
+    m_data  <= out_data;
   end generate;
 
 -- FULLY REGISTERED OUTPUT -----------------------------------------------------
   gen_data_register : if OPT_DATA_REG generate
-    out_data <= reg_data;
-    out_last <= reg_last;
-    -- registered output signals
-    p_reg : process (clock)
-    begin
-      if rising_edge(clock) then 
-        if reset_n = '0' then
-          reg_data  <= (others => '0');
-          reg_last  <= '0';
-          skd_data  <= (others => '0');
-          skd_last  <= '0';
-          reg_valid <= '0';
-        else
-          reg_valid <= s_valid_i;
-          if reg_ready = '1' then
-            skd_data <= s_data_i;
-            skd_last <= s_last_i;
-          else
-            skd_data <= skd_data;
-            skd_last <= skd_last;
-          end if;
-
-          if m_ready_i = '0' then
-            reg_data <= reg_data;
-            reg_last <= reg_last;
-          else
-            if reg_ready = '1' then
-              reg_data <= s_data_i;
-              reg_last <= s_last_i;
-            else
-              reg_data <= skd_data;
-              reg_last <= skd_last;
-            end if;
-          end if;
+    process(s_aclk) begin
+      if rising_edge(s_aclk) then
+        if m_ready = '1' then
+          -- if: m_ is ready, continue feeding stream
+          m_data <= out_data;
+          m_valid <= out_valid; 
+          -- else: hold value until m_ acknowledges transaction
         end if;
       end if;
     end process;
   end generate;
 
-end arch_imp;
+end behav;
