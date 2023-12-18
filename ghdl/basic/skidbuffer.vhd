@@ -27,16 +27,14 @@ entity skidbuffer is
     OPT_DATA_REG : boolean := True
   );
   port (
-    s_aclk     : in std_logic;
-    s_aresetn  : in std_logic;
-
-    s_valid : in  std_logic;
-    s_ready : out std_logic;
-    s_data  : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
-
-    m_valid : out std_logic;
-    m_ready : in  std_logic;
-    m_data  : out std_logic_vector(DATA_WIDTH - 1 downto 0)
+    s_aclk    : in  std_logic;
+    s_aresetn : in  std_logic;
+    s_valid   : in  std_logic;
+    s_ready   : out std_logic;
+    s_data    : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
+    m_valid   : out std_logic;
+    m_ready   : in  std_logic;
+    m_data    : out std_logic_vector(DATA_WIDTH - 1 downto 0)
   );
 end skidbuffer;
 
