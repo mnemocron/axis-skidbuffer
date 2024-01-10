@@ -2,20 +2,20 @@
 -- Company:        
 -- Engineer:       simon.burkhardt
 -- 
--- Create Date:    2023-04-21
+-- Create Date:    2024-01-10
 -- Design Name:    Generic skidbuffer for AXI
 -- Module Name:    skidbuffer
 -- Project Name:   
 -- Target Devices: 
--- Tool Versions:  GHDL 0.37
+-- Tool Versions:  GHDL 4.0.0-dev
 -- Description:    skidbuffer for pipelining a bus handshake
 -- 
 -- Dependencies:   
 -- 
--- Revision: 1.0 - Fixed fundamental flaw when m_tready='0' at start of transaction 
--- Revision 0.01 - File Created
+-- Revision: 2.0 - it never really worked until now
 -- Additional Comments:
 -- 
+-- https://pavel-demin.github.io/red-pitaya-notes/axi-interface-buffers/
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -39,77 +39,64 @@ entity skidbuffer is
 end skidbuffer;
 
 architecture behav of skidbuffer is
-  -- register signals
-  signal reg_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal reg_valid : std_logic;
-  signal reg_ready : std_logic;
+  signal s_data_reg : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal o_data : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal o_valid : std_logic := '0';
+  signal o_ready : std_logic := '0';
+  signal i_ready : std_logic := '0';
 
-  -- skid buffer signals (only used when OPT_DATA_REG = '1')
-  signal skd_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal skd_valid : std_logic;
-
-  -- output signals for output multiplexer
-  signal out_data  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal out_valid : std_logic;
+  signal o_data_reg : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal o_valid_reg : std_logic := '0';
 
 begin
-  -- I/O connections assignments
-  s_ready <= reg_ready;
-
-  -- ready is always registered in skidbuffer
-  p_reg_ready : process(s_aclk)
-  begin
-    if rising_edge(s_aclk) then 
+  p_reg : process(s_aclk) begin
+    if rising_edge(s_aclk) then
       if s_aresetn = '0' then
-        reg_ready <= '0';
+        s_data_reg <= (others => '0');
+        o_ready <= '0';
       else
-        reg_ready <= m_ready;
-      end if;
-    end if;
-  end process;
-
-  -- output of the skidbuffer (either registered or bypass)
-  out_data  <= skd_data  when (reg_ready = '0') else s_data;
-  out_valid <= skd_valid when (reg_ready = '0') else s_valid;
-
-  -- actual skidbuffer register
-  p_reg : process (s_aclk)
-  begin
-    if rising_edge(s_aclk) then 
-      if s_aresetn = '0' then
-        skd_data  <= (others => '0');
-        skd_valid <= '0';
-      else
-        if reg_ready = '1' then
-          skd_data <= s_data;
-          skd_valid <= s_valid;
-        else
-          skd_data <= skd_data;
-          skd_valid <= skd_valid;
+        if o_ready = '1' then
+          s_data_reg <= s_data;
+        end if;
+        if o_valid = '1' then
+          o_ready <= i_ready;
         end if;
       end if;
     end if;
   end process;
 
--- NOT REGISTERED OUTPUT -------------------------------------------------------
-  gen_no_register : if not OPT_DATA_REG generate
-    -- output multiplexer
-    m_valid <= out_valid;
-    m_data  <= out_data;
+  s_ready <= o_ready;
+
+  o_valid <= s_valid OR (NOT o_ready);
+  o_data <= s_data when o_ready = '1' else s_data_reg;
+ 
+  gen_no_out_register : if not OPT_DATA_REG generate
+    m_valid <= o_valid;
+    m_data <= o_data;
+    i_ready <= m_ready;
   end generate;
 
--- FULLY REGISTERED OUTPUT -----------------------------------------------------
-  gen_data_register : if OPT_DATA_REG generate
-    process(s_aclk) begin
+  gen_out_register : if OPT_DATA_REG generate
+
+    p_out_reg : process(s_aclk) begin
       if rising_edge(s_aclk) then
-        if m_ready = '1' then
-          -- if: m_ is ready, continue feeding stream
-          m_data <= out_data;
-          m_valid <= out_valid; 
-          -- else: hold value until m_ acknowledges transaction
+        if s_aresetn = '0' then
+          o_valid_reg <= '0';
+          o_data_reg <= (others => '0');
+        else
+          if i_ready = '1' then
+            o_valid_reg <= o_valid;
+            o_data_reg <= o_data;
+          end if;
         end if;
       end if;
     end process;
+
+    i_ready <= m_ready OR (NOT o_valid_reg);
+    m_data <= o_data_reg;
+    m_valid <= o_valid_reg;
+
   end generate;
+
 
 end behav;

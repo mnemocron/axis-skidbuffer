@@ -49,7 +49,7 @@ architecture bh of tb_skid is
   component skidbuffer is
     generic (
       DATA_WIDTH   : integer;
-      OPT_DATA_REG : boolean
+      OPT_DATA_REG : boolean := True
     );
     port (
       s_aclk     : in std_logic;
@@ -92,6 +92,9 @@ architecture bh of tb_skid is
   CONSTANT T_END_BURST_3 : integer := 15+2+1;
   CONSTANT T_START_BURST_4 : integer := 20;
   CONSTANT T_END_BURST_4 : integer := 20+2;
+
+  CONSTANT T_START_BURST_5 : integer := 30;
+  CONSTANT T_END_BURST_5 : integer := 30+2+3;
 
 begin
 
@@ -159,6 +162,13 @@ begin
           sim_ready_data <= '1';
         end if;
 
+        if clk_count = T_START_BURST_5-2 then
+          sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_5+3 then
+          sim_ready_data <= '1';
+        end if;
+
       end if;
     end if;
   end process;
@@ -199,6 +209,13 @@ begin
           sim_valid_data <= '1';
         end if;
         if clk_count = T_END_BURST_4 then
+          sim_valid_data <= '0';
+        end if;
+
+        if clk_count = T_START_BURST_5 then
+          sim_valid_data <= '1';
+        end if;
+        if clk_count = T_END_BURST_5 then
           sim_valid_data <= '0';
         end if;
       end if;
@@ -252,8 +269,8 @@ begin
 -- DUT instance and connections
   skidbuffer_inst : skidbuffer
   generic map (
-      DATA_WIDTH    => DATA_WIDTH,
-      OPT_DATA_REG  => OPT_DATA_REG
+      DATA_WIDTH   => DATA_WIDTH,
+      OPT_DATA_REG => OPT_DATA_REG
   )
   port map (
     s_aclk    => clk,
