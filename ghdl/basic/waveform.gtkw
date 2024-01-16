@@ -1,11 +1,11 @@
 [*]
-[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Tue Jan 16 06:26:07 2024
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Tue Jan 16 01:46:12 2024
 [*]
-[dumpfile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/ghdl/basic/wave.vcd"
-[dumpfile_mtime] "Tue Jan 16 06:24:56 2024"
-[dumpfile_size] 12434
-[savefile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/ghdl/basic/waveform.gtkw"
+[dumpfile] "/mnt/c/Users/burkhardt/Documents/git/axis-skidbuffer/ghdl/basic/wave.vcd"
+[dumpfile_mtime] "Tue Jan 16 12:42:14 2024"
+[dumpfile_size] 12836
+[savefile] "/mnt/c/Users/burkhardt/Documents/git/axis-skidbuffer/ghdl/basic/waveform.gtkw"
 [timestart] 0
 [size] 1920 1057
 [pos] -1 -1

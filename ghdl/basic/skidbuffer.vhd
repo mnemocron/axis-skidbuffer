@@ -1,8 +1,8 @@
 ----------------------------------------------------------------------------------
 -- Company:        
--- Engineer:       simon.burkhardt / burkhardt@anapico.com
+-- Engineer:       simon.burkhardt
 -- 
--- Create Date:    2024-01-10
+-- Create Date:    2024-01-16
 -- Design Name:    Generic skidbuffer for AXI
 -- Module Name:    skidbuffer
 -- Project Name:   
@@ -17,7 +17,7 @@
 --
 -- Dependencies:   
 -- 
--- Revision: 2.0 - it never really worked until now
+-- Revision: 2.1 - it never really worked until now
 -- Additional Comments:
 -- 
 -- https://pavel-demin.github.io/red-pitaya-notes/axi-interface-buffers/

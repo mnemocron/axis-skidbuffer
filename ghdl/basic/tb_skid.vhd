@@ -85,16 +85,11 @@ architecture bh of tb_skid is
   signal clk_count : unsigned(7 downto 0) := (others => '0');
 
   CONSTANT T_START_BURST_1 : integer := 3;
-  CONSTANT T_END_BURST_1 : integer := 3+4+1;
   CONSTANT T_START_BURST_2 : integer := 10;
-  CONSTANT T_END_BURST_2 : integer := 10+2+1;
-  CONSTANT T_START_BURST_3 : integer := 15;
-  CONSTANT T_END_BURST_3 : integer := 15+2+1;
-  CONSTANT T_START_BURST_4 : integer := 20;
-  CONSTANT T_END_BURST_4 : integer := 20+2;
-
-  CONSTANT T_START_BURST_5 : integer := 30;
-  CONSTANT T_END_BURST_5 : integer := 30+2+3;
+  CONSTANT T_START_BURST_3 : integer := 18;
+  CONSTANT T_START_BURST_4 : integer := 28;
+  CONSTANT T_START_BURST_5 : integer := 37;
+  CONSTANT T_START_BURST_6 : integer := 50;
 
 begin
 
@@ -128,46 +123,52 @@ begin
       else
         m_axis_tready <= sim_ready_data;
         
-        -- not ready, mid burst
-        if clk_count = T_START_BURST_1-1 then
-          sim_ready_data <= '1';
-        end if;
+        -- react to m_valid being asserted
         if clk_count = T_START_BURST_1+1 then
-          sim_ready_data <= '0';
-        end if;
-        if clk_count = T_START_BURST_1+2 then
           sim_ready_data <= '1';
         end if;
 
-        -- hiccup right before burst
-        if clk_count = T_START_BURST_2-1 then
+        -- interrupt transfer mid-burst
+        if clk_count = T_START_BURST_2+1 then
           sim_ready_data <= '0';
         end if;
-        if clk_count = T_START_BURST_2 then
+        if clk_count = T_START_BURST_2+2 then
           sim_ready_data <= '1';
         end if;
 
-        -- hiccup on first burst beat
+        -- interrupt transfer right before burst -- keep low for min. 2 cycles
         if clk_count = T_START_BURST_3 then
           sim_ready_data <= '0';
         end if;
-        if clk_count = T_START_BURST_3+1 then
+        if clk_count = T_START_BURST_3+3 then
           sim_ready_data <= '1';
         end if;
 
-        -- hiccup after first burst beat
-        if clk_count = T_START_BURST_4+1 then
+        -- interrupt transfer on last beat
+        if clk_count = T_START_BURST_4+3 then
           sim_ready_data <= '0';
         end if;
-        if clk_count = T_START_BURST_4+2 then
+        if clk_count = T_START_BURST_4+5 then
           sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_4+6 then
+          sim_ready_data <= '0';
         end if;
 
-        if clk_count = T_START_BURST_5-2 then
+        -- test if m_ready passes through even if s_valid = 0
+        if clk_count = T_START_BURST_5+2 then
+          sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_5+4 then
           sim_ready_data <= '0';
         end if;
-        if clk_count = T_START_BURST_5+3 then
+
+        -- enable ready for 1 cycle
+        if clk_count = T_START_BURST_6 then
           sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_6+1 then
+          sim_ready_data <= '0';
         end if;
 
       end if;
@@ -181,44 +182,47 @@ begin
       if rst_n = '0' then
         sim_valid_data <= '0';
       else
-        -- 4 beats of burst + 1 for not ready
+        -- test if s_valid passes to m_valid if s_ready = 0
         if clk_count = T_START_BURST_1 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_END_BURST_1 then
+        if clk_count = T_START_BURST_1+4 then
           sim_valid_data <= '0';
         end if;
 
-        -- 2 beats of burst +1 not ready
+        -- interrupt transfer mid-burst
         if clk_count = T_START_BURST_2 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_END_BURST_2 then
+        if clk_count = T_START_BURST_2+5 then
           sim_valid_data <= '0';
         end if;
-
-        -- 2 beats of burst +1 not ready
+        
+        -- interrupt transfer right before burst
         if clk_count = T_START_BURST_3 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_END_BURST_3 then
+        if clk_count = T_START_BURST_3+7 then
           sim_valid_data <= '0';
         end if;
 
-        -- 2 beats of burst +1 not ready
+        -- interrupt transfer on last beat
         if clk_count = T_START_BURST_4 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_END_BURST_4 then
+        if clk_count = T_START_BURST_4+4 then
           sim_valid_data <= '0';
         end if;
 
+        -- test if m_ready passes through even if s_valid = 0
         if clk_count = T_START_BURST_5 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_END_BURST_5 then
+        if clk_count = T_START_BURST_5+4 then
           sim_valid_data <= '0';
         end if;
+
+
       end if;
     end if;
   end process;
@@ -257,11 +261,16 @@ begin
             s_axis_tdata <= s_axis_tdata;
             sim_data <= sim_data;
           end if;
+
+          if unsigned(s_axis_tdata) = 0 then
+            s_axis_tdata(0) <= '1';
+            sim_data(0) <= '1';
+          end if;
           s_axis_tvalid <= '1';
         else 
-          s_axis_tvalid <= '0';
           s_axis_tdata <= (others => '0');
-          sim_data <= sim_data;
+          sim_data <= (others => '0');
+          s_axis_tvalid <= '0';
         end if;
       end if;
     end if;
