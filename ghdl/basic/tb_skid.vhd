@@ -40,7 +40,7 @@ entity tb_skid is
   generic
   (
     DATA_WIDTH   : natural := 8;
-    OPT_DATA_REG : boolean := True
+    OPT_DATA_REG : boolean := False
   );
 end tb_skid;
 
@@ -49,7 +49,7 @@ architecture bh of tb_skid is
   component skidbuffer is
     generic (
       DATA_WIDTH   : integer;
-      OPT_DATA_REG : boolean := True
+      OPT_DATA_REG : boolean
     );
     port (
       s_aclk     : in std_logic;
@@ -68,19 +68,19 @@ architecture bh of tb_skid is
   constant CLK_PERIOD: TIME := 5 ns;
 
   signal sim_valid_data  : std_logic := '0';
-  signal sim_ready_data  : std_logic := '1';
+  signal sim_ready_data  : std_logic := '0';
   signal sim_data        : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   signal s_axis_tvalid : std_logic := '0';
   signal s_axis_tdata  : std_logic_vector(DATA_WIDTH-1 downto 0);
-  signal s_axis_tready : std_logic;
+  signal s_axis_tready : std_logic := '0';
 
-  signal m_axis_tvalid : std_logic;
+  signal m_axis_tvalid : std_logic := '0';
   signal m_axis_tdata  : std_logic_vector(DATA_WIDTH-1 downto 0);
   signal m_axis_tready : std_logic := '0';
 
-  signal clk   : std_logic;
-  signal rst_n : std_logic;
+  signal clk   : std_logic := '0';
+  signal rst_n : std_logic := '0';
 
   signal clk_count : unsigned(7 downto 0) := (others => '0');
 
@@ -113,6 +113,7 @@ begin
   begin 
     rst_n <= '0';
     wait until rising_edge(clk);
+    wait until rising_edge(clk);
     wait for (CLK_PERIOD / 4);
     rst_n <= '1';
     wait;
@@ -123,7 +124,7 @@ begin
   begin
     if rising_edge(clk) then
       if rst_n = '0' then
-        m_axis_tready <= '1';
+        m_axis_tready <= '0';
       else
         m_axis_tready <= sim_ready_data;
         
