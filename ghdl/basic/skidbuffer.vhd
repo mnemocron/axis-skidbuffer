@@ -1,13 +1,13 @@
 ----------------------------------------------------------------------------------
 -- Company:        
--- Engineer:       simon.burkhardt / burkhardt@anapico.com
+-- Engineer:       simon.burkhardt
 -- 
--- Create Date:    2024-01-10
+-- Create Date:    2024-01-17
 -- Design Name:    Generic skidbuffer for AXI
 -- Module Name:    skidbuffer
 -- Project Name:   
 -- Target Devices: 
--- Tool Versions:  GHDL 4.0.0-dev
+-- Tool Versions:  GHDL 4.0.0-dev / Vivado 2019.1
 -- Description:    skidbuffer for pipelining a bus handshake
 --                 will always register the TREADY path from M <-- S
 --                 option to also register the TDATA/TVALID path from M --> S
@@ -17,7 +17,7 @@
 --
 -- Dependencies:   
 -- 
--- Revision: 2.0 - it never really worked until now
+-- Revision: 
 -- Additional Comments:
 -- 
 -- https://pavel-demin.github.io/red-pitaya-notes/axi-interface-buffers/
@@ -76,12 +76,15 @@ architecture behav of skidbuffer is
 
   signal en_ready : std_logic := '0';
 
+  signal o_data_reg : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal o_valid_reg : std_logic := '0';
+
 begin
   p_reg : process(s_aclk) begin
     if rising_edge(s_aclk) then
       if s_aresetn = '0' then
         s_data_reg <= (others => '0');
-        o_ready <= '0';
+        o_ready <= '1';
       else
         if o_ready = '1' then
           s_data_reg <= s_data;
@@ -99,10 +102,32 @@ begin
   o_data <= s_data when o_ready = '1' else s_data_reg;
   o_valid <= en_ready;
  
-
+  gen_no_out_register : if not OPT_DATA_REG generate
     m_valid <= o_valid;
     m_data <= o_data;
     i_ready <= m_ready;
+  end generate;
 
+  gen_out_register : if OPT_DATA_REG generate
+
+    p_out_reg : process(s_aclk) begin
+      if rising_edge(s_aclk) then
+        if s_aresetn = '0' then
+          o_valid_reg <= '0';
+          o_data_reg <= (others => '0');
+        else
+          if i_ready = '1' then
+            o_valid_reg <= o_valid;
+            o_data_reg <= o_data;
+          end if;
+        end if;
+      end if;
+    end process;
+
+    i_ready <= m_ready OR (NOT o_valid_reg);
+    m_data <= o_data_reg;
+    m_valid <= o_valid_reg;
+
+  end generate;
 
 end behav;

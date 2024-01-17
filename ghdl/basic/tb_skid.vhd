@@ -40,7 +40,7 @@ entity tb_skid is
   generic
   (
     DATA_WIDTH   : natural := 8;
-    OPT_DATA_REG : boolean := False
+    OPT_DATA_REG : boolean := True
   );
 end tb_skid;
 
@@ -84,12 +84,12 @@ architecture bh of tb_skid is
 
   signal clk_count : unsigned(7 downto 0) := (others => '0');
 
-  CONSTANT T_START_BURST_1 : integer := 3;
+  CONSTANT T_START_BURST_1 : integer := 2;
   CONSTANT T_START_BURST_2 : integer := 10;
-  CONSTANT T_START_BURST_3 : integer := 18;
-  CONSTANT T_START_BURST_4 : integer := 28;
-  CONSTANT T_START_BURST_5 : integer := 37;
-  CONSTANT T_START_BURST_6 : integer := 50;
+  CONSTANT T_START_BURST_3 : integer := 20;
+  CONSTANT T_START_BURST_4 : integer := 30;
+  CONSTANT T_START_BURST_5 : integer := 40;
+  CONSTANT T_START_BURST_7 : integer := 50;
 
 begin
 
@@ -124,7 +124,10 @@ begin
         m_axis_tready <= sim_ready_data;
         
         -- react to m_valid being asserted
-        if clk_count = T_START_BURST_1+1 then
+        if clk_count = T_START_BURST_1+1 AND OPT_DATA_REG = False then
+          sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_1+2 AND OPT_DATA_REG = True then
           sim_ready_data <= '1';
         end if;
 
@@ -148,27 +151,50 @@ begin
         if clk_count = T_START_BURST_4+3 then
           sim_ready_data <= '0';
         end if;
-        if clk_count = T_START_BURST_4+5 then
+        if clk_count = T_START_BURST_4+4 then
           sim_ready_data <= '1';
         end if;
-        if clk_count = T_START_BURST_4+6 then
+        if clk_count = T_START_BURST_4+5 AND OPT_DATA_REG = False then
+          sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_4+6 AND OPT_DATA_REG = True then
           sim_ready_data <= '0';
         end if;
 
         -- test if m_ready passes through even if s_valid = 0
-        if clk_count = T_START_BURST_5+2 then
+        if clk_count = T_START_BURST_5-1 then
           sim_ready_data <= '1';
         end if;
-        if clk_count = T_START_BURST_5+4 then
+        if clk_count = T_START_BURST_5+5 then
           sim_ready_data <= '0';
         end if;
-
-        -- enable ready for 1 cycle
-        if clk_count = T_START_BURST_6 then
+        
+        if clk_count = T_START_BURST_7+2 then
           sim_ready_data <= '1';
         end if;
-        if clk_count = T_START_BURST_6+1 then
+        if clk_count = T_START_BURST_7+3 then
           sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_7+6 then
+          sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_7+7 then
+          sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_7+10 then
+          sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_7+11 then
+          sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_7+14 then
+          sim_ready_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_7+15 then
+          sim_ready_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_7+18 then
+          sim_ready_data <= '1';
         end if;
 
       end if;
@@ -202,7 +228,10 @@ begin
         if clk_count = T_START_BURST_3 then
           sim_valid_data <= '1';
         end if;
-        if clk_count = T_START_BURST_3+7 then
+        if clk_count = T_START_BURST_3+7 AND OPT_DATA_REG = False then
+          sim_valid_data <= '0';
+        end if;
+        if clk_count = T_START_BURST_3+6 AND OPT_DATA_REG = True then
           sim_valid_data <= '0';
         end if;
 
@@ -222,6 +251,12 @@ begin
           sim_valid_data <= '0';
         end if;
 
+        if clk_count = T_START_BURST_7 then
+          sim_valid_data <= '1';
+        end if;
+        if clk_count = T_START_BURST_7+12 then
+          sim_valid_data <= '0';
+        end if;
 
       end if;
     end if;
