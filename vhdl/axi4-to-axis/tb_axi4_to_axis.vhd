@@ -4,7 +4,7 @@
 -- 
 -- Create Date:    2023-04-21
 -- Design Name:    skid buffer testbench
--- Module Name:    tb_axis - bh
+-- Module Name:    tb_axi4_to_axis - bh
 -- Project Name:   
 -- Target Devices: 
 -- Tool Versions:  GHDL 0.37
@@ -36,7 +36,7 @@ use ieee.numeric_std.all;
 --   when sim_ready_data = '1'
 
 -- simulate both with OPT_DATA_REG = True / False
-entity tb_axis is
+entity tb_axi4_to_axis is
   generic
   (
     OPT_DATA_REG         : boolean   := True;
@@ -57,9 +57,9 @@ entity tb_axis is
     -- Width of optional user defined signal in write response channel
     C_S_AXI_BUSER_WIDTH  : integer   := 0
   );
-end tb_axis;
+end tb_axi4_to_axis;
 
-architecture bh of tb_axis is
+architecture bh of tb_axi4_to_axis is
   -- DUT component declaration
   component axi4_to_axis is
     generic (

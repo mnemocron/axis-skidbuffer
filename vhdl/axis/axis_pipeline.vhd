@@ -2,7 +2,7 @@
 -- Company:        
 -- Engineer:       simon.burkhardt
 -- 
--- Create Date:    2023-04-21
+-- Create Date:    2024-01-17
 -- Design Name:    AXIS axis_pipeline
 -- Module Name:    tb_skid - bh
 -- Project Name:   
@@ -67,8 +67,8 @@ architecture arch_imp of axis_pipeline is
   -- skidbuffer component
   component skidbuffer is
   generic (
-    DATA_WIDTH   : natural;
-    OPT_DATA_REG : boolean);
+    DATA_WIDTH  : natural;
+    OPT_OUT_REG : boolean);
     port (
       s_aclk    : in  std_logic;
       s_aresetn : in  std_logic;
@@ -128,8 +128,8 @@ begin
 
   skidbuffer_inst : skidbuffer
   generic map (
-      DATA_WIDTH    => C_DATAPATH_WIDTH,
-      OPT_DATA_REG  => True
+    DATA_WIDTH  => C_DATAPATH_WIDTH,
+    OPT_OUT_REG => True
   )
   port map (
     s_aclk    => aclk,

@@ -199,21 +199,19 @@ architecture arch_imp of axi4_to_axis is
   -- skidbuffer component
   component skidbuffer is
   generic (
-    DATA_WIDTH   : natural;
-    OPT_DATA_REG : boolean);
+    DATA_WIDTH  : natural;
+    OPT_OUT_REG : boolean);
     port (
-       clock     : in  std_logic;
-       reset_n   : in  std_logic;
+       s_aclk    : in  std_logic;
+       s_aresetn : in  std_logic;
 
-       s_valid_i : in  std_logic;
-       s_last_i  : in  std_logic;
-       s_ready_o : out std_logic;
-       s_data_i  : in  std_logic_vector((C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)) - 1 downto 0);
+       s_valid : in  std_logic;
+       s_ready : out std_logic;
+       s_data  : in  std_logic_vector((C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8))+1 - 1 downto 0);
 
-       m_valid_o : out std_logic;
-       m_last_o  : out std_logic;
-       m_ready_i : in  std_logic;
-       m_data_o  : out std_logic_vector((C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)) - 1 downto 0));
+       m_valid : out std_logic;
+       m_ready : in  std_logic;
+       m_data  : out std_logic_vector((C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8))+1 - 1 downto 0));
   end component;
 
   type axi_rx_state_t is (AXI_RX_STATE_IDLE, AXI_RX_STATE_SIMPLE, AXI_RX_STATE_MULTI);
@@ -225,14 +223,14 @@ architecture arch_imp of axi4_to_axis is
 
   signal i_s_axis_tvalid : std_logic := '0';
   signal i_s_axis_tdata  : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-  signal i_s_axis_data_strb  : std_logic_vector(C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+  signal i_s_axis_data_strb  : std_logic_vector(C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)+1-1 downto 0);
   signal i_s_axis_tstrb  : std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
   signal i_s_axis_tlast  : std_logic;
   signal o_s_axis_tready : std_logic;
 
   signal o_m_axis_tvalid : std_logic;
   signal o_m_axis_tdata  : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-  signal o_m_axis_data_strb  : std_logic_vector(C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+  signal o_m_axis_data_strb  : std_logic_vector(C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)+1-1 downto 0);
   signal o_m_axis_tstrb  : std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
   signal o_m_axis_tlast  : std_logic;
   signal i_m_axis_tready : std_logic := '0';
@@ -341,9 +339,10 @@ begin
   S_AXI_WREADY  <= o_axi_wready;
 
   -- combine strobe and data signals into single "data" channel
-  i_s_axis_data_strb <= i_s_axis_tdata & i_s_axis_tstrb;
+  i_s_axis_data_strb <= i_s_axis_tlast & i_s_axis_tdata & i_s_axis_tstrb;
   o_m_axis_tdata <= o_m_axis_data_strb( (C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)) - 1 downto (C_S_AXI_DATA_WIDTH/8) );
   o_m_axis_tstrb <= o_m_axis_data_strb( (C_S_AXI_DATA_WIDTH/8) - 1 downto 0 );
+  o_m_axis_tlast <= o_m_axis_data_strb(o_m_axis_data_strb'HIGH);
 
   p_axi_rx_flow_state : process(aclk)
   begin
@@ -426,22 +425,20 @@ begin
 
   skidbuffer_inst : skidbuffer
   generic map (
-      DATA_WIDTH    => (C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)),
-      OPT_DATA_REG  => True
+    DATA_WIDTH  => (C_S_AXI_DATA_WIDTH+(C_S_AXI_DATA_WIDTH/8)+1),
+    OPT_OUT_REG => True
   )
   port map (
-    clock     => aclk,
-    reset_n   => aresetn,
+    s_aclk     => aclk,
+    s_aresetn   => aresetn,
 
-    s_valid_i => i_s_axis_tvalid,
-    s_last_i  => i_s_axis_tlast,
-    s_ready_o => o_s_axis_tready,
-    s_data_i  => i_s_axis_data_strb,
+    s_valid => i_s_axis_tvalid,
+    s_ready => o_s_axis_tready,
+    s_data  => i_s_axis_data_strb,
 
-    m_valid_o => o_m_axis_tvalid,
-    m_last_o  => o_m_axis_tlast,
-    m_ready_i => i_m_axis_tready,
-    m_data_o  => o_m_axis_data_strb
+    m_valid => o_m_axis_tvalid,
+    m_ready => i_m_axis_tready,
+    m_data  => o_m_axis_data_strb
   );
 
 end arch_imp;

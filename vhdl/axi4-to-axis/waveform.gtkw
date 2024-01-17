@@ -1,65 +1,67 @@
 [*]
-[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Mon Apr 24 14:50:47 2023
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Wed Jan 17 16:47:58 2024
 [*]
-[dumpfile] "C:\Users\simon\Downloads\P9\ghdl-axi-sim\axis-skidbuffer\ghdl\axi4-to-axis\wave.vcd"
-[dumpfile_mtime] "Mon Apr 24 14:02:53 2023"
-[dumpfile_size] 40720
-[savefile] "C:\Users\simon\Downloads\P9\ghdl-axi-sim\axis-skidbuffer\ghdl\axi4-to-axis\waveform.gtkw"
+[dumpfile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/vhdl/axi4-to-axis/wave.vcd"
+[dumpfile_mtime] "Wed Jan 17 16:40:04 2024"
+[dumpfile_size] 36758
+[savefile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/vhdl/axi4-to-axis/waveform.gtkw"
 [timestart] 0
 [size] 1858 1057
-[pos] -1929 -9
-*-26.000000 238500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-[treeopen] tb_axis.
-[sst_width] 224
+[pos] -1 -1
+*-24.000000 237950000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_axi4_to_axis.
+[sst_width] 247
 [signals_width] 214
 [sst_expanded] 1
 [sst_vpaned_height] 314
-@24
-[color] 5
-tb_axis.clk_count[7:0]
 @28
-[color] 3
-tb_axis.clk
-[color] 3
-tb_axis.rst_n
-tb_axis.axi_converter_inst.s_axi_awvalid
-tb_axis.axi_converter_inst.s_axi_awready
-tb_axis.axi_converter_inst.s_axi_awburst[1:0]
+tb_axi4_to_axis.clk
 @22
-tb_axis.axi_converter_inst.s_axi_awlen[7:0]
+tb_axi4_to_axis.clk_count[7:0]
 @28
-tb_axis.axi_converter_inst.s_axi_awsize[2:0]
-tb_axis.axi_converter_inst.s_axi_awid[2:0]
-[color] 2
-tb_axis.axi_converter_inst.s_axi_wvalid
-[color] 2
-tb_axis.axi_converter_inst.s_axi_wready
-@24
-[color] 2
-tb_axis.axi_converter_inst.s_axi_wdata[7:0]
+tb_axi4_to_axis.rst_n
+@22
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_awaddr[7:0]
 @28
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_awburst[1:0]
 [color] 2
-tb_axis.axi_converter_inst.s_axi_wlast
-[color] 2
-tb_axis.axi_converter_inst.s_axi_wstrb[0]
+tb_axi4_to_axis.axi_converter_inst.s_axi_awid[2:0]
+@22
 [color] 3
-tb_axis.axi_converter_inst.s_axi_bvalid
-[color] 3
-tb_axis.axi_converter_inst.s_axi_bready
-[color] 3
-tb_axis.axi_converter_inst.s_axi_bresp[1:0]
-[color] 3
-tb_axis.axi_converter_inst.s_axi_bid[2:0]
-tb_axis.axi_converter_inst.m_axis_tvalid
-@24
-tb_axis.axi_converter_inst.m_axis_tready
-tb_axis.axi_converter_inst.m_axis_tdata[7:0]
+tb_axi4_to_axis.axi_converter_inst.s_axi_awlen[7:0]
 @28
-tb_axis.axi_converter_inst.m_axis_tlast
-tb_axis.axi_converter_inst.debug_state[1:0]
-tb_axis.axi_converter_inst.bresp_pending
-@24
-tb_axis.outstanding_xfers[7:0]
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_awsize[2:0]
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_awvalid
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_awready
+@22
+tb_axi4_to_axis.axi_converter_inst.s_axi_wdata[7:0]
+@28
+tb_axi4_to_axis.axi_converter_inst.s_axi_wlast
+tb_axi4_to_axis.axi_converter_inst.s_axi_wstrb[0]
+tb_axi4_to_axis.axi_converter_inst.s_axi_wvalid
+@29
+tb_axi4_to_axis.axi_converter_inst.s_axi_wready
+@28
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_bresp[1:0]
+[color] 2
+tb_axi4_to_axis.axi_converter_inst.s_axi_bid[2:0]
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_bready
+[color] 3
+tb_axi4_to_axis.axi_converter_inst.s_axi_bvalid
+@22
+tb_axi4_to_axis.axi_converter_inst.m_axis_tdata[7:0]
+@28
+tb_axi4_to_axis.axi_converter_inst.m_axis_tlast
+tb_axi4_to_axis.axi_converter_inst.m_axis_tstrb[0]
+tb_axi4_to_axis.axi_converter_inst.m_axis_tvalid
+tb_axi4_to_axis.axi_converter_inst.m_axis_tready
 [pattern_trace] 1
 [pattern_trace] 0

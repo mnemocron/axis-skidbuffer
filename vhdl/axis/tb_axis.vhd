@@ -35,12 +35,12 @@ use ieee.numeric_std.all;
 --   the downstream slave after the DUT will signal ready-to-receive 
 --   when sim_ready_data = '1'
 
--- simulate both with OPT_DATA_REG = True / False
+-- simulate both with OPT_OUT_REG = True / False
 entity tb_axis is
   generic
   (
-    DATA_WIDTH   : natural := 8;
-    OPT_DATA_REG : boolean := True
+    DATA_WIDTH  : natural := 8;
+    OPT_OUT_REG : boolean := True
   );
 end tb_axis;
 
