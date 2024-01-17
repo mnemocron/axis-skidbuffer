@@ -30,7 +30,7 @@ PACKAGE skidbuffer_pkg IS
     COMPONENT skidbuffer is
       generic (
         DATA_WIDTH  : integer := 32;
-        OPT_DATA_REG : boolean := True
+        OPT_OUT_REG : boolean := True
       );
       port (
         s_aclk    : in  std_logic;
@@ -53,7 +53,7 @@ use work.skidbuffer_pkg.all;
 entity skidbuffer is
   generic (
     DATA_WIDTH  : integer := 32;
-    OPT_DATA_REG : boolean := True
+    OPT_OUT_REG : boolean := True
   );
   port (
     s_aclk    : in  std_logic;
@@ -102,13 +102,13 @@ begin
   o_data <= s_data when o_ready = '1' else s_data_reg;
   o_valid <= en_ready;
  
-  gen_no_out_register : if not OPT_DATA_REG generate
+  gen_no_out_register : if not OPT_OUT_REG generate
     m_valid <= o_valid;
     m_data <= o_data;
     i_ready <= m_ready;
   end generate;
 
-  gen_out_register : if OPT_DATA_REG generate
+  gen_out_register : if OPT_OUT_REG generate
 
     p_out_reg : process(s_aclk) begin
       if rising_edge(s_aclk) then

@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Jan 17 12:28:56 2024
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Wed Jan 17 16:25:56 2024
 [*]
-[dumpfile] "/mnt/c/Users/burkhardt/Documents/git/axis-skidbuffer/ghdl/basic/wave.vcd"
-[dumpfile_mtime] "Wed Jan 17 12:29:18 2024"
-[dumpfile_size] 12974
-[savefile] "/mnt/c/Users/burkhardt/Documents/git/axis-skidbuffer/ghdl/basic/waveform.gtkw"
-[timestart] 0
+[dumpfile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/ghdl/basic/wave.vcd"
+[dumpfile_mtime] "Wed Jan 17 16:25:02 2024"
+[dumpfile_size] 19411
+[savefile] "/mnt/c/Users/simon/Downloads/FPGA/repositories/axis-skidbuffer/ghdl/basic/waveform.gtkw"
+[timestart] 184400000
 [size] 1920 1057
-[pos] -1 -1
-*-25.000000 120600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -158 -229
+*-25.000000 233200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] tb_skid.
 [sst_width] 214
 [signals_width] 317
@@ -23,18 +23,31 @@ tb_skid.clk_count[7:0]
 tb_skid.clk
 [color] 3
 tb_skid.rst_n
-tb_skid.s_axis_tvalid
+tb_skid.s_axis_u_tvalid
 @22
-tb_skid.s_axis_tdata[7:0]
+tb_skid.s_axis_u_tdata[7:0]
 @28
-tb_skid.s_axis_tready
+tb_skid.s_axis_u_tready
 [color] 2
-tb_skid.m_axis_tvalid
+tb_skid.m_axis_u_tvalid
 @22
 [color] 2
-tb_skid.m_axis_tdata[7:0]
+tb_skid.m_axis_u_tdata[7:0]
 @28
 [color] 2
-tb_skid.m_axis_tready
+tb_skid.m_axis_u_tready
+tb_skid.s_axis_r_tvalid
+@22
+tb_skid.s_axis_r_tdata[7:0]
+@28
+tb_skid.s_axis_r_tready
+[color] 2
+tb_skid.m_axis_r_tvalid
+@22
+[color] 2
+tb_skid.m_axis_r_tdata[7:0]
+@29
+[color] 2
+tb_skid.m_axis_r_tready
 [pattern_trace] 1
 [pattern_trace] 0
